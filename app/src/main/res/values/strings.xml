@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Тестовое задание (Farkhod)</string>
+    <string name="permission_header">Запрос доступа</string>
+    <string name="permission_text">Для полноценной работы необходимы следующие разрешения</string>
+    <string name="cancel">Отмена</string>
+    <string name="emptyHeader">Заголовок статьи</string>
+    <string name="NoInternetConnestion">Отсутствует интернет соединение</string>
+    <string name="play_stop">Play or Stop</string>
+</resources>
