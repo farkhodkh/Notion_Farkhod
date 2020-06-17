@@ -9,8 +9,8 @@
 
 Camera fragment
 
-<img src="gif_files/2020-06-17_11-42-23.gif.gif" width="380" />
+<img src="gif_files/2020-06-17_11-42-23.gif" width="380" />
 
 Chat fragment
 
-<img src="gif_files/2020-06-17_11-43-05.gif.gif" width="380" />
+<img src="gif_files/2020-06-17_11-43-05.gif" width="380" />
