@@ -59,7 +59,7 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
     val SENSOR_ORIENTATION_DEFAULT_DEGREES = 90
     val INVERSE_ORIENTATIONS = SparseIntArray()
     val DEFAULT_ORIENTATIONS = SparseIntArray()
-    lateinit var mCurrentFile: File
+    var mCurrentFile: File? = null
     var mCameraDevice: CameraDevice? = null
     var mPreviewSession: CameraCaptureSession? = null
     lateinit var mPreviewSize: Size
@@ -163,7 +163,7 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
                     startRecordingVideo()
                     mRecordVideo.setImageResource(R.drawable.ic_stop)
                     //Receive out put file here
-                    mOutputFilePath = getCurrentFile().absolutePath
+                    mOutputFilePath = getCurrentFile()?.absolutePath ?: ""
                 }
             R.id.mPlayVideo -> {
                 mVideoView.start()
@@ -223,10 +223,6 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
         }
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        mTextureView = view.findViewById(getTextureResource())
-//    }
-
     fun onResumeView() {
         GlobalScope.launch(Dispatchers.Main) {
 
@@ -238,9 +234,6 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
                 }
                 startBackgroundThread()
             }
-//            else{
-//                App.premissionManager.checkPermissions()
-//            }
         }
     }
 
@@ -249,7 +242,7 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
         stopBackgroundThread()
     }
 
-    fun getCurrentFile(): File = mCurrentFile
+    fun getCurrentFile(): File? = mCurrentFile
 
     fun startBackgroundThread() {
         mBackgroundThread = HandlerThread("CameraBackground")
@@ -261,8 +254,6 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
         mBackgroundThread?.quitSafely()
         try {
             mBackgroundThread?.join()
-//            mBackgroundThread = null
-//            mBackgroundHandler = null
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
@@ -293,11 +284,17 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
             val manager =
                 App.activity.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
-            for (cameraId in manager.cameraIdList) {
-                val b = 0
+            var cameraId: String = manager.cameraIdList.get(0)
+
+            for (camId in manager.cameraIdList) {
+                val camercameraCharaChar = manager.getCameraCharacteristics(camId)
+                val facing = camercameraCharaChar.get(CameraCharacteristics.LENS_FACING)
+                if (facing ==  CameraCharacteristics.LENS_FACING_FRONT){
+                    cameraId = camId
+                    break
+                }
             }
 
-            val cameraId: String = manager.cameraIdList.get(0)
             val characteristics = manager.getCameraCharacteristics(cameraId)
             val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             val mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)
@@ -473,7 +470,7 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
     }
 
     fun setUpMediaRecorder() {
-        if (null == App.activity) {
+        if (null == App.activity||App.premissionManager.isPermissionsGranted()!=0) {
             return
         }
 
@@ -482,7 +479,7 @@ class FotoFragmentPresenter : MvpPresenter<FotoFragmentView>() {
         mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
 
         mCurrentFile = getOutputMediaFile()!!
-        mMediaRecorder?.setOutputFile(mCurrentFile.absolutePath)
+        mMediaRecorder?.setOutputFile(mCurrentFile?.absolutePath)
         val profile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P)
         mMediaRecorder?.setVideoFrameRate(profile.videoFrameRate)
         mMediaRecorder?.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight)

@@ -20,7 +20,7 @@ class ManagePermissionsUtility {
         }
     }
 
-    suspend fun isPermissionsGranted(): Int {
+    fun isPermissionsGranted(): Int {
         var counter = 0
         for (permission in list) {
             counter += ContextCompat.checkSelfPermission(App.context, permission)
